@@ -2,6 +2,7 @@ package main
 
 import (
 	_ "Beego-demo/routers"
+	_ "Beego-demo/sysinit"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 )

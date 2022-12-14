@@ -1,9 +1,11 @@
 package models
 
-import "github.com/astaxie/beego/orm"
+import (
+	"github.com/astaxie/beego/orm"
+)
 
 type MenuModel struct {
-	Mid    int `orm:"pk:auto"`
+	Mid    int `orm:"pk;auto"`
 	Parent int
 	Name   string `orm:"size(45)"`
 	Seq    int
@@ -16,11 +18,11 @@ type MenuTree struct {
 }
 
 func (m *MenuModel) TableName() string {
-	return "xcms_menu"
+	return "bee_menu"
 }
 
 func MenuStruct() map[int]MenuTree {
-	query := orm.NewOrm().QueryTable("xcms_menu")
+	query := orm.NewOrm().QueryTable("bee_menu")
 	data := make([]*MenuModel, 0)
 	query.OrderBy("parent", "-seq").All(&data)
 
@@ -43,9 +45,42 @@ func MenuStruct() map[int]MenuTree {
 }
 
 func MenuList() ([]*MenuModel, int64) {
-	query := orm.NewOrm().QueryTable("menu")
+	query := orm.NewOrm().QueryTable("bee_menu")
 	total, _ := query.Count()
 	data := make([]*MenuModel, 0)
 	query.OrderBy("parent", "-seq").All(&data)
 	return data, total
+}
+
+func MenuTreeStruct() map[int]MenuTree {
+	//query := orm.NewOrm().QueryTable(TbNameMenu())
+	query := orm.NewOrm().QueryTable("bee_menu")
+	data := make([]*MenuModel, 0)
+	query.OrderBy("parent", "-seq").Limit(1000).All(&data)
+
+	var menu = make(map[int]MenuTree)
+	//auth
+	//if len(user.AuthStr) > 0 {
+	//var authArr []int
+	//json.Unmarshal([]byte(user.AuthStr), &authArr)
+	//sort.Ints(authArr)
+
+	for _, v := range data {
+		if 0 == v.Parent {
+			//idx := sort.SearchInts(authArr, v.Mid)
+			//found := (idx < len(authArr) && authArr[idx] == v.Mid)
+			//if found {
+			var tree = new(MenuTree)
+			tree.MenuModel = *v
+			menu[v.Mid] = *tree
+			//}
+		} else {
+			if tmp, ok := menu[v.Parent]; ok {
+				tmp.Child = append(tmp.Child, *v)
+				menu[v.Parent] = tmp
+			}
+		}
+	}
+	//}
+	return menu
 }
