@@ -13,12 +13,11 @@ type Page struct {
 }
 
 func init() {
-	orm.RegisterDataBase("default", "mysql", "root@135246@tcp(127.0.0.1:3306)")
+	orm.RegisterDataBase("default", "mysql", "root@root@tcp(127.0.0.1:3306)")
 	orm.RegisterModel(new(Page))
 }
 
 func GetPage() Page {
-
 	o := orm.NewOrm()
 	p := Page{Id: 1}
 	err := o.Read(&p)
