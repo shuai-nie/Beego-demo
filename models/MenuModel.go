@@ -53,7 +53,6 @@ func MenuList() ([]*MenuModel, int64) {
 }
 
 func MenuTreeStruct() map[int]MenuTree {
-	//query := orm.NewOrm().QueryTable(TbNameMenu())
 	query := orm.NewOrm().QueryTable("bee_menu")
 	data := make([]*MenuModel, 0)
 	query.OrderBy("parent", "-seq").Limit(1000).All(&data)
