@@ -3,8 +3,11 @@ package controllers
 import (
 	"Beego-demo/consts"
 	"Beego-demo/models"
+	"encoding/json"
 	"fmt"
 	"github.com/astaxie/beego"
+	"io/ioutil"
+	"net/http"
 	"strings"
 )
 
@@ -60,4 +63,53 @@ func (c *BaseController) listJsonResult(code consts.JsonResultCode, msg string, 
 	c.Data["json"] = r
 	c.ServeJSON()
 	c.StopRun()
+}
+
+func (c *BaseController) auth() models.UserModel {
+	user := c.GetSession("user")
+	fmt.Println("user", user)
+	if user == nil {
+		c.Redirect("/login", 302)
+		c.StopRun()
+		return models.UserModel{}
+	}else{
+		fmt.Println("get user:", user.(models.UserModel))
+		return user.(models.UserModel)
+	}
+}
+
+func (c *BaseController) checkToken() interface{} {
+	oauth_token := c.GetSession("oauth_token")
+	fmt.Println("oauth_token", oauth_token)
+	if oauth_token != nil {
+		req, err := http.NewRequest(http.MethodGet, "http://localhost:9096/test", nil)
+		req.Header.Set("Content-Type", "application/x-www-urlencoded")
+		req.Header.Set("Authorizetion", "Bearer "+oauth_token.(string))
+		client := &http.Client{}
+		resp, err := client.Do(req)
+		if err != nil {
+			fmt.Println(err)
+			return ""
+		}
+		defer resp.Body.Close()
+		bs, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			fmt.Println(err)
+			return ""
+		}
+		fmt.Println("resp str:", string(bs))
+		m := make(map[string]interface{})
+		err = json.Unmarshal(bs, &m)
+		if err != nil {
+			fmt.Println("Umarshal failed:", err)
+			c.Redirect("/login", 302)
+			c.StopRun()
+		}
+		fmt.Println("map:", m)
+		return m
+	}else{
+		c.Redirect("/login", 302)
+		c.StopRun()
+		return ""
+	}
 }
