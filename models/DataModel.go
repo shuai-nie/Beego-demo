@@ -17,7 +17,7 @@ type DataModel struct {
 }
 
 func (m *DataModel) TableName() string {
-	return "data"
+	return "bee_data"
 }
 
 func DataList(mid, pageSize, page int) ([]map[string]interface{}, int64) {

@@ -20,7 +20,7 @@ func (c *LoginController) Index() {
 
 		if len(userkey) > 0 && len(password) > 0 {
 			user := models.GetUserByName(userkey)
-			if password == user.Password {
+			if password == user.PassWord {
 				c.SetSession("user", user)
 				c.Redirect("/", 302)
 				c.StopRun()

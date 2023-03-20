@@ -2,28 +2,32 @@ package models
 
 import "github.com/astaxie/beego/orm"
 
+
+
 type UserModel struct {
-	UserId   int
-	UserKey  string
-	UserName string
-	AuthStr  string
-	Password string
-	IsAdmin  int8
+	UserId int `orm:"pk;auto"`
+	UserKey string `orm:"size(64);unique"`
+	UserName string `orm:"size(64)"`
+	AuthStr string `orm:"size(512)"`
+	PassWord string `orm:"size(128)"`
+	IsAdmin int8 `orm:"default(0)"`
 }
 
 func (m *UserModel) TableName() string {
-	return "user"
+	return "bee_user"
 }
 
 func UserStruct() []*UserModel {
-	query := orm.NewOrm().QueryTable("user")
+	query := orm.NewOrm().QueryTable("bee_user")
 	data := make([]*UserModel, 0)
 	query.OrderBy("-user_id").All(&data)
 	return data
 }
 
+
+
 func UserList(pageSize, page int) ([]*UserModel, int64) {
-	query := orm.NewOrm().QueryTable("user")
+	query := orm.NewOrm().QueryTable("bee_user")
 	total, _ := query.Count()
 	offset := (page - 1) * pageSize
 	data := make([]*UserModel, 0)
